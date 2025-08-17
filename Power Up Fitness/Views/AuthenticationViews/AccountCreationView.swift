@@ -1,0 +1,18 @@
+//
+//  AccountCreationView.swift
+//  Power Up Fitness
+//
+//  Created by Lucas Hunter on 8/16/25.
+//
+
+import SwiftUI
+
+struct AccountCreationView: View {
+    var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    }
+}
+
+#Preview {
+    AccountCreationView()
+}
