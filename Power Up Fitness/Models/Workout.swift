@@ -7,41 +7,51 @@
 
 import Foundation
 
-enum WorkoutType: Identifiable, Codable {
+enum WorkoutType: Identifiable, Codable, Hashable {
     case strength(StrengthWorkout)
     case endurance(EnduranceWorkout)
     case highIntensityCardio(HighIntensityCardioWorkout)
+    
+    var id: UUID {
+        switch self {
+        case .strength(let workout):
+            return workout.id
+        case .endurance(let workout):
+            return workout.id
+        case .highIntensityCardio(let workout):
+            return workout.id
+        }
+    }
 }
 
-struct StrengthWorkout: Identifiable, Codable {
-    var id = UUID()
+struct StrengthWorkout: Identifiable, Codable, Hashable {
+    let id = UUID()
     var name: String
     var date: Date
     var exercises: [Exercise]
 }
 
-struct Exercise: Codable {
+struct Exercise: Codable, Hashable {
     var name: String
     var sets: Int
     var reps: Int
     var weight: Double 
 }
 
-struct EnduranceWorkout: Identifiable, Codable {
-    var id = UUID()
+struct EnduranceWorkout: Identifiable, Codable, Hashable {
+    let id = UUID()
     var name: String
     var date: Date
     var duration: Int // in minutes
 }
 
-enum HighIntensityCardioWorkout: Identifiable, Codable {
-    var id = UUID()
+struct HighIntensityCardioWorkout: Identifiable, Codable, Hashable {
+    let id = UUID()
     var date: Date
     var type: HICWorkoutType
-    
 }
 
-enum HICWorkoutType: Identifiable, Codable {
+enum HICWorkoutType: Identifiable, Codable, Hashable {
     case aerobicAnaerobic(HICAerobicAnaerobic)
     case generalConditioning(HICGeneralConditioning)
     case powerDevelopment(HICPowerDevelopment)
@@ -58,16 +68,25 @@ enum HICWorkoutType: Identifiable, Codable {
     }
 }
 
-struct HICAerobicAnaerobic: Codable {
-    var id = UUID()
+struct HICAerobicAnaerobic: Identifiable, Codable, Hashable {
+    let id = UUID()
+    var preset: HICAerobicAnaerobicPreset
+    var duration: Int? // in minutes
+    var notes: String?
 }
 
-struct HICGeneralConditioning: Codable {
-    var id = UUID()
+struct HICGeneralConditioning: Identifiable, Codable, Hashable {
+    let id = UUID()
+    var preset: HICGeneralConditioningPreset
+    var duration: Int? // in minutes
+    var notes: String?
 }
 
-struct HICPowerDevelopment: Codable {
-    var id = UUID()
+struct HICPowerDevelopment: Identifiable, Codable, Hashable {
+    let id = UUID()
+    var preset: HICPowerDevelopmentPreset
+    var duration: Int? // in minutes
+    var notes: String?
 }
 
 enum HICAerobicAnaerobicPreset: String, Codable, CaseIterable {

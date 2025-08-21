@@ -22,7 +22,9 @@ struct Power_Up_FitnessApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                WorkoutListView()
+            }
         }
     }
 }
