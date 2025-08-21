@@ -66,6 +66,19 @@ enum HICWorkoutType: Identifiable, Codable, Hashable {
             return workout.id
         }
     }
+    
+    static func getPresetFromName(_ name: String) -> HICWorkoutType? {
+        if let aerobicPreset = HICAerobicAnaerobicPreset(rawValue: name) {
+            return .aerobicAnaerobic(HICAerobicAnaerobic(preset: aerobicPreset, duration: nil, notes: nil))
+        }
+        if let conditioningPreset = HICGeneralConditioningPreset(rawValue: name) {
+            return .generalConditioning(HICGeneralConditioning(preset: conditioningPreset, duration: nil, notes: nil))
+        }
+        if let powerPreset = HICPowerDevelopmentPreset(rawValue: name) {
+            return .powerDevelopment(HICPowerDevelopment(preset: powerPreset, duration: nil, notes: nil))
+        }
+        return nil
+    }
 }
 
 struct HICAerobicAnaerobic: Identifiable, Codable, Hashable {

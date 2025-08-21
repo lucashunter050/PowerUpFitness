@@ -17,11 +17,18 @@ enum CardioMethod: String, CaseIterable, Hashable {
     case other = "Other"
 }
 
+enum DistanceUnit: String, CaseIterable, Hashable {
+    case miles = "mi"
+    case kilometers = "km"
+}
+
 struct AddEnduranceWorkoutView: View {
     @State private var selectedCardioMethod: CardioMethod = .running
     @State private var customCardioMethod: String = ""
     @State private var duration: Double = 30 // Duration in minutes
     @State private var heartRate: Double = 120 // Heart rate in BPM
+    @State private var distance: String = ""
+    @State private var distanceUnit: DistanceUnit = .miles
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -82,7 +89,7 @@ struct AddEnduranceWorkoutView: View {
             // Heart Rate Gauge
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Heart Rate")
+                    Text("Average Heart Rate")
                         .font(.headline)
                     
                     Spacer()
@@ -177,6 +184,27 @@ struct AddEnduranceWorkoutView: View {
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
+                }
+            }
+            
+            // Distance Input
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Distance Covered")
+                    .font(.headline)
+                
+                HStack(spacing: 12) {
+                    TextField("0.0", text: $distance)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.decimalPad)
+                        .frame(maxWidth: .infinity)
+                    
+                    Picker("Unit", selection: $distanceUnit) {
+                        ForEach(DistanceUnit.allCases, id: \.self) { unit in
+                            Text(unit.rawValue).tag(unit)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 100)
                 }
             }
             

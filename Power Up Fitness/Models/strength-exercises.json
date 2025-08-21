@@ -1,0 +1,36 @@
+{
+  "Max Strength Lifts": {
+    "Squat": [
+      "Barbell Back Squat",
+      "Front Squat",
+      "Safety Bar Squat",
+      "Goblet Squat",
+      "Pistol Squat"
+    ],
+    "Bench Press": [
+      "Barbell Bench Press",
+      "Close-Grip Bench Press",
+      "Floor Press",
+      "Incline Bench Press",
+      "Dumbbell Bench Press"
+    ],
+    "Overhead Press": [
+      "Barbell Overhead Press",
+      "Push Press",
+      "Seated Overhead Press",
+      "Dumbbell Shoulder Press"
+    ],
+    "Deadlift": [
+      "Conventional Deadlift",
+      "Sumo Deadlift",
+      "Trap Bar Deadlift",
+      "Romanian Deadlift"
+    ],
+    "Pull-up": [
+      "Weighted Pull-up",
+      "Weighted Neutral-Grip Pull-up",
+      "Commando Pull-up",
+      "Weighted Chin-up"
+    ]
+  }
+}
