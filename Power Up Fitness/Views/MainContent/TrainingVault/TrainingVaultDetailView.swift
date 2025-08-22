@@ -18,7 +18,7 @@ struct TrainingVaultDetailView: View {
                     HStack {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 32, weight: .medium))
-                            .foregroundColor(.orange)
+                            .foregroundColor(.red)
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(workout.title)
@@ -35,10 +35,10 @@ struct TrainingVaultDetailView: View {
                         Text("Workout \(workout.number)")
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.red)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(Color.orange.opacity(0.1))
+                            .background(Color.red.opacity(0.1))
                             .cornerRadius(12)
                     }
                 }

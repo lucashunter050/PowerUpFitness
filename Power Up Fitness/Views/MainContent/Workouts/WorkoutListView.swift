@@ -14,7 +14,7 @@ struct WorkoutListView: View {
     @Query(sort: \EnduranceWorkout.date, order: .reverse) private var enduranceWorkouts: [EnduranceWorkout]
     @Query(sort: \HighIntensityCardioWorkout.date, order: .reverse) private var hicWorkouts: [HighIntensityCardioWorkout]
     
-    @State private var showingAddWorkout = false
+
     
     private var allWorkouts: [WorkoutType] {
         var workouts: [WorkoutType] = []
@@ -57,15 +57,10 @@ struct WorkoutListView: View {
             .navigationTitle("Workouts")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddWorkout = true
-                    }) {
+                    NavigationLink(destination: AddWorkoutView()) {
                         Image(systemName: "plus")
                     }
                 }
-            }
-            .sheet(isPresented: $showingAddWorkout) {
-                AddWorkoutView()
             }
     }
     

@@ -28,66 +28,60 @@ struct AddWorkoutView: View {
     @StateObject private var hicWorkoutData = HICWorkoutData()
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-
-            // Header
-            HStack {
-                Text("Add Workout")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Spacer()
-            }
-            .padding(.horizontal)
-
-            // Workout Type Selection
-            HStack {
-                Text("Workout Type")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Picker("Workout Type", selection: $selectedWorkoutCategory) {
-                    ForEach(WorkoutCategory.allCases, id: \.self) { category in
-                        Text(category.rawValue).tag(category)
+        ScrollView {
+            VStack(spacing: 20) {
+                // Workout Type Selection
+                HStack {
+                    Text("Workout Type")
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    Picker("Workout Type", selection: $selectedWorkoutCategory) {
+                        ForEach(WorkoutCategory.allCases, id: \.self) { category in
+                            Text(category.rawValue).tag(category)
+                        }
                     }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
                 }
-                .pickerStyle(.menu)
-                .labelsHidden()
-            }
-            .padding(.horizontal)
-            .padding(.vertical)
+                .padding(.horizontal)
 
-            // Workout Details
-            switch selectedWorkoutCategory {
-            case .strength:
-                AddStrengthWorkoutView(workoutData: strengthWorkoutData)
-            case .endurance:
-                AddEnduranceWorkoutView(workoutData: enduranceWorkoutData)
-            case .highIntensityCardio:
-                AddHighIntensityCardioView(workoutData: hicWorkoutData)
-            }
-            
-            HStack {
-                DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
-                DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
-            }
-            .padding(.horizontal)
-            .padding(.vertical)
+                // Workout Details
+                switch selectedWorkoutCategory {
+                case .strength:
+                    AddStrengthWorkoutView(workoutData: strengthWorkoutData)
+                case .endurance:
+                    AddEnduranceWorkoutView(workoutData: enduranceWorkoutData)
+                case .highIntensityCardio:
+                    AddHighIntensityCardioView(workoutData: hicWorkoutData)
+                }
+                
+                VStack(spacing: 16) {
+                    DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
+                    DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
+                }
+                .padding(.horizontal)
 
-            // Save Button
-            Button(action: {
-                saveWorkout()
-            }) {
-                Text("Save")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                // Save Button
+                Button(action: {
+                    saveWorkout()
+                }) {
+                    Text("Save Workout")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
-            .padding()
+            .padding(.top)
         }
+        .navigationTitle("Add Workout")
+        .navigationBarTitleDisplayMode(.large)
     }
     
     private func saveWorkout() {

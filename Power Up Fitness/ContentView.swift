@@ -23,6 +23,14 @@ struct ContentView: View {
                 Image(systemName: "folder")
                 Text("Training Vault")
             }
+            
+            NavigationView {
+                UserProfileView()
+            }
+            .tabItem {
+                Image(systemName: "person.circle")
+                Text("Profile")
+            }
         }
     }
 }

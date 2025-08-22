@@ -14,7 +14,7 @@ struct TrainingVaultRowView: View {
         HStack {
             Image(systemName: "flame.fill")
                 .font(.system(size: 20, weight: .medium))
-                .foregroundColor(.orange)
+                .foregroundColor(.red)
                 .frame(width: 28, height: 28)
             
             VStack(alignment: .leading, spacing: 4) {
