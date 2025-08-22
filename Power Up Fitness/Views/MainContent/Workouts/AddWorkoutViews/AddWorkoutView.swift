@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 enum WorkoutCategory: String, CaseIterable, Hashable {
     case strength = "Strength"
@@ -14,12 +15,22 @@ enum WorkoutCategory: String, CaseIterable, Hashable {
 }
 
 struct AddWorkoutView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
     @State private var selectedWorkoutCategory: WorkoutCategory = .strength
     @State private var selectedDate: Date = Date()
     @State private var time: Date = Date()
+    
+    // Child view references to get their data
+    @StateObject private var strengthWorkoutData = StrengthWorkoutData()
+    @StateObject private var enduranceWorkoutData = EnduranceWorkoutData()
+    @StateObject private var hicWorkoutData = HICWorkoutData()
 
     var body: some View {
         VStack(spacing: 0) {
+            Spacer()
+
             // Header
             HStack {
                 Text("Add Workout")
@@ -50,11 +61,11 @@ struct AddWorkoutView: View {
             // Workout Details
             switch selectedWorkoutCategory {
             case .strength:
-                AddStrengthWorkoutView()
+                AddStrengthWorkoutView(workoutData: strengthWorkoutData)
             case .endurance:
-                AddEnduranceWorkoutView()
+                AddEnduranceWorkoutView(workoutData: enduranceWorkoutData)
             case .highIntensityCardio:
-                AddHighIntensityCardioView()
+                AddHighIntensityCardioView(workoutData: hicWorkoutData)
             }
             
             HStack {
@@ -66,7 +77,7 @@ struct AddWorkoutView: View {
 
             // Save Button
             Button(action: {
-                // Save workout
+                saveWorkout()
             }) {
                 Text("Save")
                     .frame(maxWidth: .infinity)
@@ -78,6 +89,95 @@ struct AddWorkoutView: View {
             .padding()
         }
     }
+    
+    private func saveWorkout() {
+        let workoutDate = Calendar.current.date(bySettingHour: Calendar.current.component(.hour, from: time),
+                                               minute: Calendar.current.component(.minute, from: time),
+                                               second: 0,
+                                               of: selectedDate) ?? selectedDate
+        
+        switch selectedWorkoutCategory {
+        case .strength:
+            let workout = StrengthWorkout(
+                name: strengthWorkoutData.workoutName.isEmpty ? "Strength Workout" : strengthWorkoutData.workoutName,
+                date: workoutDate,
+                exercises: strengthWorkoutData.exercises.compactMap { exerciseData in
+                    guard !exerciseData.exercise.isEmpty else { return nil }
+                    // Take the first set's data as representative (could be enhanced later)
+                    let firstSet = exerciseData.sets.first ?? StrengthWorkoutData.ExerciseSet()
+                    return Exercise(
+                        name: exerciseData.exercise,
+                        sets: exerciseData.sets.count,
+                        reps: Int(firstSet.reps) ?? 0,
+                        weight: Double(firstSet.weight) ?? 0.0
+                    )
+                }
+            )
+            modelContext.insert(workout)
+            
+        case .endurance:
+            let workout = EnduranceWorkout(
+                cardioMethod: enduranceWorkoutData.selectedCardioMethod.rawValue,
+                customCardioMethod: enduranceWorkoutData.customCardioMethod.isEmpty ? nil : enduranceWorkoutData.customCardioMethod,
+                date: workoutDate,
+                duration: Int(enduranceWorkoutData.duration),
+                heartRate: Int(enduranceWorkoutData.heartRate),
+                distance: enduranceWorkoutData.distance.isEmpty ? nil : Double(enduranceWorkoutData.distance),
+                distanceUnit: enduranceWorkoutData.distanceUnit.rawValue
+            )
+            modelContext.insert(workout)
+            
+        case .highIntensityCardio:
+            let workout = HighIntensityCardioWorkout(
+                date: workoutDate,
+                presetName: hicWorkoutData.selectedPreset,
+                duration: Int(hicWorkoutData.duration),
+                notes: hicWorkoutData.notes.isEmpty ? nil : hicWorkoutData.notes
+            )
+            modelContext.insert(workout)
+        }
+        
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            print("Failed to save workout: \(error)")
+        }
+    }
+}
+
+// MARK: - Data Classes for Child Views
+class StrengthWorkoutData: ObservableObject {
+    @Published var workoutName: String = ""
+    @Published var exercises: [StrengthExerciseData] = [StrengthExerciseData()]
+    
+    struct StrengthExerciseData: Identifiable, Hashable {
+        let id = UUID()
+        var category: String = ""
+        var exercise: String = ""
+        var sets: [ExerciseSet] = [ExerciseSet()]
+    }
+    
+    struct ExerciseSet: Identifiable, Hashable {
+        let id = UUID()
+        var reps: String = ""
+        var weight: String = ""
+    }
+}
+
+class EnduranceWorkoutData: ObservableObject {
+    @Published var selectedCardioMethod: CardioMethod = .running
+    @Published var customCardioMethod: String = ""
+    @Published var duration: Double = 30
+    @Published var heartRate: Double = 120
+    @Published var distance: String = ""
+    @Published var distanceUnit: DistanceUnit = .miles
+}
+
+class HICWorkoutData: ObservableObject {
+    @Published var selectedPreset: String = ""
+    @Published var duration: Double = 10
+    @Published var notes: String = ""
 }
 
 #Preview {

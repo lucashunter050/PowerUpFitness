@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -20,11 +21,26 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct Power_Up_FitnessApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            StrengthWorkout.self,
+            EnduranceWorkout.self,
+            HighIntensityCardioWorkout.self,
+            Exercise.self
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+    
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                WorkoutListView()
-            }
+            ContentView()
         }
+        .modelContainer(sharedModelContainer)
     }
 }

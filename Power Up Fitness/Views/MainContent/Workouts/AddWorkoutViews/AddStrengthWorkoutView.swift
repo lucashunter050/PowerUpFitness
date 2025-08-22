@@ -36,14 +36,14 @@ struct ExerciseDatabase {
 
 
 struct AddStrengthWorkoutView: View {
-    @State private var exercises: [StrengthExercise] = [StrengthExercise()]
+    @ObservedObject var workoutData: StrengthWorkoutData
     @State private var exerciseDatabase: ExerciseDatabase?
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 // Exercises List
-                ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
+                ForEach(Array(workoutData.exercises.enumerated()), id: \.element.id) { index, exercise in
                     VStack(alignment: .leading, spacing: 12) {
                         // Exercise Selection
                         HStack {
@@ -53,7 +53,7 @@ struct AddStrengthWorkoutView: View {
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                 
-                                Picker("Category", selection: $exercises[index].category) {
+                                Picker("Category", selection: $workoutData.exercises[index].category) {
                                     Text("Select").tag("")
                                     if let database = exerciseDatabase {
                                         ForEach(database.categoryNames, id: \.self) { category in
@@ -63,8 +63,8 @@ struct AddStrengthWorkoutView: View {
                                 }
                                 .pickerStyle(.menu)
                                 .labelsHidden()
-                                .onChange(of: exercises[index].category) { _ in
-                                    exercises[index].exercise = ""
+                                .onChange(of: workoutData.exercises[index].category) { _ in
+                                    workoutData.exercises[index].exercise = ""
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,7 +78,7 @@ struct AddStrengthWorkoutView: View {
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                     
-                                    Picker("Exercise", selection: $exercises[index].exercise) {
+                                    Picker("Exercise", selection: $workoutData.exercises[index].exercise) {
                                         Text("Select").tag("")
                                         if let database = exerciseDatabase {
                                             ForEach(database.exercises(for: exercise.category), id: \.self) { exerciseName in
@@ -107,7 +107,7 @@ struct AddStrengthWorkoutView: View {
                                     Spacer()
                                     
                                     Button(action: {
-                                        exercises[index].sets.append(ExerciseSet())
+                                        workoutData.exercises[index].sets.append(StrengthWorkoutData.ExerciseSet())
                                     }) {
                                         Image(systemName: "plus.circle.fill")
                                             .foregroundColor(.blue)
@@ -125,7 +125,7 @@ struct AddStrengthWorkoutView: View {
                                             Text("Reps")
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
-                                            TextField("0", text: $exercises[index].sets[setIndex].reps)
+                                            TextField("0", text: $workoutData.exercises[index].sets[setIndex].reps)
                                                 .textFieldStyle(.roundedBorder)
                                                 .keyboardType(.numberPad)
                                         }
@@ -134,14 +134,14 @@ struct AddStrengthWorkoutView: View {
                                             Text("Weight (lbs)")
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
-                                            TextField("0", text: $exercises[index].sets[setIndex].weight)
+                                            TextField("0", text: $workoutData.exercises[index].sets[setIndex].weight)
                                                 .textFieldStyle(.roundedBorder)
                                                 .keyboardType(.decimalPad)
                                         }
                                         
                                         if exercise.sets.count > 1 {
                                             Button(action: {
-                                                exercises[index].sets.remove(at: setIndex)
+                                                workoutData.exercises[index].sets.remove(at: setIndex)
                                             }) {
                                                 Image(systemName: "minus.circle")
                                                     .foregroundColor(.red)
@@ -163,7 +163,7 @@ struct AddStrengthWorkoutView: View {
                 
                 // Add Exercise Button
                 Button(action: {
-                    exercises.append(StrengthExercise())
+                    workoutData.exercises.append(StrengthWorkoutData.StrengthExerciseData())
                 }) {
                     HStack {
                         Image(systemName: "plus.circle.fill")
@@ -205,5 +205,5 @@ struct AddStrengthWorkoutView: View {
 }
 
 #Preview {
-    AddStrengthWorkoutView()
+    AddStrengthWorkoutView(workoutData: StrengthWorkoutData())
 }

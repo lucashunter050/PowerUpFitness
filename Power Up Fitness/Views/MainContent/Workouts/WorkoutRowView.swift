@@ -12,8 +12,10 @@ struct WorkoutRowView: View {
     
     var body: some View {
         HStack {
-            Text(workoutEmoji)
-                .font(.system(size: 26))
+            Image(systemName: workoutIcon)
+                .font(.system(size: 24, weight: .medium))
+                .foregroundColor(workoutIconColor)
+                .frame(width: 32, height: 32)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(workoutName)
@@ -34,14 +36,25 @@ struct WorkoutRowView: View {
         .padding(.vertical, 4)
     }
     
-    private var workoutEmoji: String {
+    private var workoutIcon: String {
         switch workout {
         case .strength:
-            return "🏋️‍♀️"
+            return "dumbbell.fill"
         case .endurance:
-            return "🏃‍♂️"
+            return "figure.run"
         case .highIntensityCardio:
-            return "🥵"
+            return "flame.fill"
+        }
+    }
+    
+    private var workoutIconColor: Color {
+        switch workout {
+        case .strength:
+            return .blue
+        case .endurance:
+            return .green
+        case .highIntensityCardio:
+            return .red
         }
     }
     
@@ -50,16 +63,9 @@ struct WorkoutRowView: View {
         case .strength(let strengthWorkout):
             return strengthWorkout.name
         case .endurance(let enduranceWorkout):
-            return enduranceWorkout.name
+            return enduranceWorkout.cardioMethod
         case .highIntensityCardio(let hicWorkout):
-            switch hicWorkout.type {
-            case .aerobicAnaerobic(let workout):
-                return workout.preset.rawValue
-            case .generalConditioning(let workout):
-                return workout.preset.rawValue
-            case .powerDevelopment(let workout):
-                return workout.preset.rawValue
-            }
+            return hicWorkout.presetName
         }
     }
     

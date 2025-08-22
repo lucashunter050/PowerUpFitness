@@ -23,12 +23,7 @@ enum DistanceUnit: String, CaseIterable, Hashable {
 }
 
 struct AddEnduranceWorkoutView: View {
-    @State private var selectedCardioMethod: CardioMethod = .running
-    @State private var customCardioMethod: String = ""
-    @State private var duration: Double = 30 // Duration in minutes
-    @State private var heartRate: Double = 120 // Heart rate in BPM
-    @State private var distance: String = ""
-    @State private var distanceUnit: DistanceUnit = .miles
+    @ObservedObject var workoutData: EnduranceWorkoutData
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -41,7 +36,7 @@ struct AddEnduranceWorkoutView: View {
                     
                     Spacer()
                     
-                    Picker("Cardio Method", selection: $selectedCardioMethod) {
+                    Picker("Cardio Method", selection: $workoutData.selectedCardioMethod) {
                         ForEach(CardioMethod.allCases, id: \.self) { method in
                             Text(method.rawValue).tag(method)
                         }
@@ -53,8 +48,8 @@ struct AddEnduranceWorkoutView: View {
 
                 
                 // Custom input field for "Other" option
-                if selectedCardioMethod == .other {
-                    TextField("Enter cardio method", text: $customCardioMethod)
+                if workoutData.selectedCardioMethod == .other {
+                    TextField("Enter cardio method", text: $workoutData.customCardioMethod)
                         .transition(.opacity.combined(with: .slide))
                 }
             }
@@ -67,12 +62,12 @@ struct AddEnduranceWorkoutView: View {
                     
                     Spacer()
                     
-                    Text("\(Int(duration)) minutes")
+                    Text("\(Int(workoutData.duration)) minutes")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 
-                Slider(value: $duration, in: 1...120, step: 1) {
+                Slider(value: $workoutData.duration, in: 1...120, step: 1) {
                     Text("Duration")
                 } minimumValueLabel: {
                     Text("1m")
@@ -94,7 +89,7 @@ struct AddEnduranceWorkoutView: View {
                     
                     Spacer()
                     
-                    Text("\(Int(heartRate)) BPM")
+                    Text("\(Int(workoutData.heartRate)) BPM")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -120,11 +115,11 @@ struct AddEnduranceWorkoutView: View {
                                     startPoint: .leading,
                                     endPoint: .trailing
                                 ))
-                                .frame(width: (heartRate - 60) / (220 - 60) * geometry.size.width, height: 12)
+                                .frame(width: (workoutData.heartRate - 60) / (220 - 60) * geometry.size.width, height: 12)
                             
                             // Draggable heart icon
                             Image(systemName: "heart.fill")
-                                .foregroundColor(getHeartColor(for: heartRate))
+                                .foregroundColor(getHeartColor(for: workoutData.heartRate))
                                 .font(.system(size: 20, weight: .bold))
                                 .background(
                                     Circle()
@@ -132,12 +127,12 @@ struct AddEnduranceWorkoutView: View {
                                         .frame(width: 28, height: 28)
                                         .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 1)
                                 )
-                                .offset(x: (heartRate - 60) / (220 - 60) * geometry.size.width - 14)
+                                .offset(x: (workoutData.heartRate - 60) / (220 - 60) * geometry.size.width - 14)
                                 .gesture(
                                     DragGesture()
                                         .onChanged { value in
                                             let newValue = 60 + (value.location.x / geometry.size.width) * (220 - 60)
-                                            heartRate = min(max(newValue, 60), 220)
+                                            workoutData.heartRate = min(max(newValue, 60), 220)
                                         }
                                 )
                         }
@@ -155,28 +150,28 @@ struct AddEnduranceWorkoutView: View {
                         Text("Resting")
                             .font(.caption2)
                             .foregroundColor(.green)
-                            .opacity(heartRate < 100 ? 1.0 : 0.5)
+                            .opacity(workoutData.heartRate < 100 ? 1.0 : 0.5)
                         
                         Spacer()
                         
                         Text("Moderate")
                             .font(.caption2)
                             .foregroundColor(.yellow)
-                            .opacity(heartRate >= 100 && heartRate < 150 ? 1.0 : 0.5)
+                            .opacity(workoutData.heartRate >= 100 && workoutData.heartRate < 150 ? 1.0 : 0.5)
                         
                         Spacer()
                         
                         Text("Vigorous")
                             .font(.caption2)
                             .foregroundColor(.orange)
-                            .opacity(heartRate >= 150 && heartRate < 180 ? 1.0 : 0.5)
+                            .opacity(workoutData.heartRate >= 150 && workoutData.heartRate < 180 ? 1.0 : 0.5)
                         
                         Spacer()
                         
                         Text("Max")
                             .font(.caption2)
                             .foregroundColor(.red)
-                            .opacity(heartRate >= 180 ? 1.0 : 0.5)
+                            .opacity(workoutData.heartRate >= 180 ? 1.0 : 0.5)
                         
                         Spacer()
                         
@@ -193,12 +188,12 @@ struct AddEnduranceWorkoutView: View {
                     .font(.headline)
                 
                 HStack(spacing: 12) {
-                    TextField("0.0", text: $distance)
+                    TextField("0.0", text: $workoutData.distance)
                         .textFieldStyle(.roundedBorder)
                         .keyboardType(.decimalPad)
                         .frame(maxWidth: .infinity)
                     
-                    Picker("Unit", selection: $distanceUnit) {
+                    Picker("Unit", selection: $workoutData.distanceUnit) {
                         ForEach(DistanceUnit.allCases, id: \.self) { unit in
                             Text(unit.rawValue).tag(unit)
                         }
@@ -211,7 +206,7 @@ struct AddEnduranceWorkoutView: View {
             Spacer()
         }
         .padding()
-        .animation(.easeInOut(duration: 0.3), value: selectedCardioMethod)
+        .animation(.easeInOut(duration: 0.3), value: workoutData.selectedCardioMethod)
     }
     
     // Helper function to get heart color based on heart rate
@@ -230,5 +225,5 @@ struct AddEnduranceWorkoutView: View {
 }
 
 #Preview {
-    AddEnduranceWorkoutView()
+    AddEnduranceWorkoutView(workoutData: EnduranceWorkoutData())
 }

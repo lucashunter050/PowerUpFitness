@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
-enum WorkoutType: Identifiable, Codable, Hashable {
+enum WorkoutType: Identifiable, Hashable {
     case strength(StrengthWorkout)
     case endurance(EnduranceWorkout)
     case highIntensityCardio(HighIntensityCardioWorkout)
@@ -22,33 +23,95 @@ enum WorkoutType: Identifiable, Codable, Hashable {
             return workout.id
         }
     }
+    
+    var date: Date {
+        switch self {
+        case .strength(let workout):
+            return workout.date
+        case .endurance(let workout):
+            return workout.date
+        case .highIntensityCardio(let workout):
+            return workout.date
+        }
+    }
+    
+    var title: String {
+        switch self {
+        case .strength(let workout):
+            return workout.name
+        case .endurance(let workout):
+            return workout.cardioMethod
+        case .highIntensityCardio(let workout):
+            return workout.presetName
+        }
+    }
 }
 
-struct StrengthWorkout: Identifiable, Codable, Hashable {
-    let id = UUID()
+@Model
+class StrengthWorkout: Identifiable {
+    var id = UUID()
     var name: String
     var date: Date
     var exercises: [Exercise]
+    
+    init(name: String, date: Date, exercises: [Exercise]) {
+        self.name = name
+        self.date = date
+        self.exercises = exercises
+    }
 }
 
-struct Exercise: Codable, Hashable {
+@Model
+class Exercise {
     var name: String
     var sets: Int
     var reps: Int
-    var weight: Double 
+    var weight: Double
+    
+    init(name: String, sets: Int, reps: Int, weight: Double) {
+        self.name = name
+        self.sets = sets
+        self.reps = reps
+        self.weight = weight
+    }
 }
 
-struct EnduranceWorkout: Identifiable, Codable, Hashable {
-    let id = UUID()
-    var name: String
+@Model
+class EnduranceWorkout: Identifiable {
+    var id = UUID()
+    var cardioMethod: String
+    var customCardioMethod: String?
     var date: Date
     var duration: Int // in minutes
+    var heartRate: Int
+    var distance: Double?
+    var distanceUnit: String?
+    
+    init(cardioMethod: String, customCardioMethod: String? = nil, date: Date, duration: Int, heartRate: Int, distance: Double? = nil, distanceUnit: String? = nil) {
+        self.cardioMethod = cardioMethod
+        self.customCardioMethod = customCardioMethod
+        self.date = date
+        self.duration = duration
+        self.heartRate = heartRate
+        self.distance = distance
+        self.distanceUnit = distanceUnit
+    }
 }
 
-struct HighIntensityCardioWorkout: Identifiable, Codable, Hashable {
-    let id = UUID()
+@Model
+class HighIntensityCardioWorkout: Identifiable {
+    var id = UUID()
     var date: Date
-    var type: HICWorkoutType
+    var presetName: String
+    var duration: Int
+    var notes: String?
+    
+    init(date: Date, presetName: String, duration: Int, notes: String? = nil) {
+        self.date = date
+        self.presetName = presetName
+        self.duration = duration
+        self.notes = notes
+    }
 }
 
 enum HICWorkoutType: Identifiable, Codable, Hashable {

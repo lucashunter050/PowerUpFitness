@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct AddHighIntensityCardioView: View {
-    @State private var selectedPreset: String = ""
-    @State private var duration: Double = 10 // Default duration in minutes
-    @State private var notes: String = ""
+    @ObservedObject var workoutData: HICWorkoutData
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -19,7 +17,8 @@ struct AddHighIntensityCardioView: View {
                 Text("Select Workout Preset")
                     .font(.headline)
                 
-                Picker("Preset", selection: $selectedPreset) {
+                Picker("Preset", selection: $workoutData.selectedPreset) {
+                    Text("Select").tag("")
                     Section(header: Text("Aerobic/Anaerobic")) {
                         ForEach(HICAerobicAnaerobicPreset.allCases, id: \.self) { preset in
                             Text(preset.rawValue).tag(preset.rawValue)
@@ -49,12 +48,12 @@ struct AddHighIntensityCardioView: View {
                     
                     Spacer()
                     
-                    Text("\(Int(duration)) minutes")
+                    Text("\(Int(workoutData.duration)) minutes")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 
-                Slider(value: $duration, in: 1...40, step: 1) {
+                Slider(value: $workoutData.duration, in: 1...40, step: 1) {
                     Text("Duration")
                 } minimumValueLabel: {
                     Text("1m")
@@ -75,7 +74,7 @@ struct AddHighIntensityCardioView: View {
                  Text("Notes")
                      .font(.headline)
                  
-                 TextField("Add workout notes...", text: $notes, axis: .vertical)
+                 TextField("Add workout notes...", text: $workoutData.notes, axis: .vertical)
                      .lineLimit(3...10)
                      .frame(minHeight: 60)
              }
@@ -91,5 +90,5 @@ struct AddHighIntensityCardioView: View {
 }
 
 #Preview {
-    AddHighIntensityCardioView()
+    AddHighIntensityCardioView(workoutData: HICWorkoutData())
 }

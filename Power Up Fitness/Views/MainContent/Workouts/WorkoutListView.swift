@@ -6,41 +6,27 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct WorkoutListView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \StrengthWorkout.date, order: .reverse) private var strengthWorkouts: [StrengthWorkout]
+    @Query(sort: \EnduranceWorkout.date, order: .reverse) private var enduranceWorkouts: [EnduranceWorkout]
+    @Query(sort: \HighIntensityCardioWorkout.date, order: .reverse) private var hicWorkouts: [HighIntensityCardioWorkout]
+    
     @State private var showingAddWorkout = false
-
-    // Sample workout data
-    let sampleWorkouts: [WorkoutType] = [
-        .strength(StrengthWorkout(
-            name: "Upper Body Strength",
-            date: Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date(),
-            exercises: [
-                Exercise(name: "Bench Press", sets: 3, reps: 8, weight: 185.0),
-                Exercise(name: "Pull-ups", sets: 3, reps: 10, weight: 0.0)
-            ]
-        )),
-        .endurance(EnduranceWorkout(
-            name: "Morning Run",
-            date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
-            duration: 30
-        )),
-        .highIntensityCardio(HighIntensityCardioWorkout(
-            date: Date(),
-            type: .aerobicAnaerobic(HICAerobicAnaerobic(
-                preset: .fast5,
-                duration: 20,
-                notes: "High intensity session"
-            ))
-        ))
-    ]
-
-    let sampleWorkoutsEmpty: [WorkoutType] = []
+    
+    private var allWorkouts: [WorkoutType] {
+        var workouts: [WorkoutType] = []
+        workouts.append(contentsOf: strengthWorkouts.map { .strength($0) })
+        workouts.append(contentsOf: enduranceWorkouts.map { .endurance($0) })
+        workouts.append(contentsOf: hicWorkouts.map { .highIntensityCardio($0) })
+        return workouts.sorted { $0.date > $1.date }
+    }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                if sampleWorkoutsEmpty.isEmpty {
+        VStack(spacing: 0) {
+                if allWorkouts.isEmpty {
                     ContentUnavailableView(
                         label: {
                             Image(systemName: "dumbbell")
@@ -56,9 +42,14 @@ struct WorkoutListView: View {
                     )
                     .padding()
                 } else {
-                    List(sampleWorkouts, id: \.id) { workout in
-                        NavigationLink(destination: WorkoutDetailView()) {
+                    List(allWorkouts, id: \.id) { workout in
+                        NavigationLink(destination: WorkoutDetailView(workout: workout)) {
                             WorkoutRowView(workout: workout)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Delete", role: .destructive) {
+                                deleteWorkout(workout)
+                            }
                         }
                     }
                 }
@@ -76,6 +67,22 @@ struct WorkoutListView: View {
             .sheet(isPresented: $showingAddWorkout) {
                 AddWorkoutView()
             }
+    }
+    
+    private func deleteWorkout(_ workout: WorkoutType) {
+        switch workout {
+        case .strength(let strengthWorkout):
+            modelContext.delete(strengthWorkout)
+        case .endurance(let enduranceWorkout):
+            modelContext.delete(enduranceWorkout)
+        case .highIntensityCardio(let hicWorkout):
+            modelContext.delete(hicWorkout)
+        }
+        
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to delete workout: \(error)")
         }
     }
 }
